@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 from django.urls import reverse
 
 from imagekit.models import ProcessedImageField
+
 
 # Create your models here.
 class Post(models.Model):
@@ -27,3 +29,13 @@ class PostTwo(models.Model):
         blank=True,
         null=True
     )
+
+class InstaUser(AbstractUser):
+    profile_pic = ProcessedImageField(
+        upload_to='static/image/profiles',
+        format='JPEG',
+        options={'quality':100},
+        blank=True,
+        null=True
+    )
+    
