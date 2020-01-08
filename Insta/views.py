@@ -64,7 +64,13 @@ class SignUp(CreateView):
     template_name = 'signup.html'
     success_url = reverse_lazy("login")
 
+class ExploreView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'explore.html'
+    login_url = 'login'
 
+    def get_queryset(self):
+        return Post.objects.all().order_by('-likes')[:20]
 
 @ajax_request
 def addLike(request):
