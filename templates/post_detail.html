@@ -6,8 +6,12 @@
 
 <div class="row single-post">
     <div class="single-post-card view-update {{ object.pk }}">
+            <li>
+                <a href="{% url 'post_update' object.pk %}">Update Post</a>
+            </li>
+
         <div class="header">
-            <a href="{% url 'hellodjango'%}">
+            <a href="{% url 'user_detail' object.author.pk%}">
                 {% if object.author.profile_pic %}
                     <img class="picture-circle--medium" src="/{{object.author.profile_pic}}">
                 {% endif %}
@@ -32,7 +36,7 @@
             <ul class="comment-list">
                 {% for comment in object.comments.all %}
                 <li class="comment-list__comment">
-                    <a href="{% url 'hellodjango'%}" class="user">
+                    <a href="{% url 'user_detail' comment.user.pk %}" class="user">
                         {{ comment.user.username }}
                     </a>
                     <span class="comment">{{ comment.comment }}</span>

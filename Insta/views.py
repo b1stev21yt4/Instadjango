@@ -20,6 +20,9 @@ class PostsView(ListView):
     template_name = 'index.html'
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return
+
         current_user = self.request.user
         following = set()
         for conn in UserConnection.objects.filter(creator=current_user).select_related('following'):
@@ -33,6 +36,11 @@ class PostDetailView(DetailView):
 class UserDetailView(DetailView):
     model = InstaUser
     template_name = 'user_detail.html'    
+
+class UserDetailUpdate(LoginRequiredMixin, UpdateView):
+    model = InstaUser
+    template_name = 'userdetail_update.html'
+    fields = ['profile_pic', 'username']
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -55,6 +63,8 @@ class SignUp(CreateView):
     template_name = 'signup.html'
     success_url = reverse_lazy("login")
 
+
+
 @ajax_request
 def addLike(request):
     post_pk = request.POST.get('post_pk')
@@ -71,4 +81,32 @@ def addLike(request):
     return {
         'result': result,
         'post_pk': post_pk
+    }
+
+@ajax_request
+def addComment(request):
+    post_pk = request.POST.get('post_pk')
+    post = Post.objects.get(pk=post_pk)
+    comment_text = request.POST.get('comment_text')
+    commentor_info = {}
+    try:
+        comment = Comment(post=post, user=request.user, comment=comment_text)
+        comment.save()
+
+        username = request.user.username
+
+        commentor_info = {
+            'username' : username,
+            'comment_text' : comment_text
+        }
+
+        result = 1
+    except Exception as e:
+        print(e)
+        result = 0
+
+    return{
+        'result' : result,
+        'post_pk' : post_pk,
+        'commenter_info' : commentor_info
     }
